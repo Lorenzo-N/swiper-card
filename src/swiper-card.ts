@@ -200,6 +200,44 @@ export class SwiperCard extends LitElement implements LovelaceCard {
             })
         }
 
+        // Set default effect (coverflow)
+        let effect: any = {
+            effect: 'coverflow',
+            coverflowEffect: {
+                depth: 200,
+                stretch: 10
+            }
+        }
+        if (this._config.effect === 'slide' || this._config.effect === 'none') {
+            effect = {}
+        } else if (this._config.effect === 'cube') {
+            effect = {
+                effect: 'cube',
+                cubeEffect: {
+                    shadow: false
+                }
+            }
+        } else if (this._config.effect === 'flip') {
+            effect = { effect: 'flip' }
+        }
+
+        // Merge default parameters
+        this.#parameters = Object.assign(
+            {
+                speed: 400,
+                spaceBetween: 5,
+                pagination: {
+                    type: 'bullets',
+                    clickable: true
+                },
+                mousewheel: {
+                    enabled: true
+                },
+                ...effect
+            },
+            this.#parameters
+        )
+
         const modules: SwiperModule[] = []
         if ('scrollbar' in this.#parameters) {
             modules.push(Scrollbar)
@@ -238,7 +276,7 @@ export class SwiperCard extends LitElement implements LovelaceCard {
                 case 'cube':
                     modules.push(EffectCube)
                     break
-                case 'card':
+                case 'cards':
                     modules.push(EffectCards)
                     break
             }
@@ -280,6 +318,14 @@ export class SwiperCard extends LitElement implements LovelaceCard {
             ${unsafeCSS(SwiperCSS)}
             :host {
                 --swiper-theme-color: var(--primary-color);
+            }
+
+            :host .swiper-wrapper {
+                margin: 2px 0 4px -3px;
+            }
+
+            :host .swiper-slide {
+                width: calc(100% - 6px) !important;
             }
         `
     }
@@ -435,6 +481,7 @@ export class SwiperCard extends LitElement implements LovelaceCard {
             }
         }
         element.className = 'swiper-slide'
+        element.style.marginLeft = '6px'
         if ('card_width' in (this._config ?? {})) {
             element.style.width = this._config?.card_width
         }
